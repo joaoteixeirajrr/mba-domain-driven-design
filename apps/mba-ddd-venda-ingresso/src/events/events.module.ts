@@ -22,6 +22,7 @@ import { PartnerService } from '../@core/events/application/partner.service';
 import { CustomerService } from '../@core/events/application/customer.service';
 import { EventService } from '../@core/events/application/event.service';
 import { OrderService } from '../@core/events/application/order.service';
+import { WaitingListService } from '../@core/events/application/waiting-list.service';
 import { PaymentGateway } from '../@core/events/application/payment.gateway';
 import { IPartnerRepository } from '../@core/events/domain/repositories/partner-repository.interface';
 import { PartnersController } from './partners/partners.controller';
@@ -30,6 +31,7 @@ import { EventsController } from './events/events.controller';
 import { EventSectionsController } from './events/event-sections.controller';
 import { EventSpotsController } from './events/event-spots.controller';
 import { OrdersController } from './orders/orders.controller';
+import { WaitingListController } from './waiting-list/waiting-list.controller';
 import { ApplicationModule } from '../application/application.module';
 import { ApplicationService } from '../@core/common/application/application.service';
 import { DomainEventManager } from '../@core/common/domain/domain-event-manager';
@@ -163,6 +165,22 @@ import { PartnerCreatedIntegrationEvent } from '../@core/events/domain/events/in
         DomainEventManager,
       ],
     },
+    {
+      provide: WaitingListService,
+      useFactory: (customerRepo, eventRepo, waitingListRepo, appService) =>
+        new WaitingListService(
+          customerRepo,
+          eventRepo,
+          waitingListRepo,
+          appService,
+        ),
+      inject: [
+        'ICustomerRepository',
+        'IEventRepository',
+        'IWaitingListRepository',
+        ApplicationService,
+      ],
+    },
   ],
   controllers: [
     PartnersController,
@@ -171,6 +189,7 @@ import { PartnerCreatedIntegrationEvent } from '../@core/events/domain/events/in
     EventSectionsController,
     EventSpotsController,
     OrdersController,
+    WaitingListController,
   ],
 })
 export class EventsModule implements OnModuleInit {
