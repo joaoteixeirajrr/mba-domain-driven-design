@@ -11,7 +11,7 @@ Este plano é derivado da leitura do `desafio.md` e do código real do monorepo.
 - [x] **Etapa 1** — Ambiente e reconhecimento do terreno
 - [x] **Etapa 2** — Design estratégico (`docs/linguagem-ubiqua.md`)
 - [x] **Etapa 3** — Domínio com testes puros
-- [ ] **Etapa 4** — Persistência (schemas, custom types, repositórios)
+- [x] **Etapa 4** — Persistência (schemas, custom types, repositórios)
 - [ ] **Etapa 5** — Comando de cancelamento (application service + REST)
 - [ ] **Etapa 6** — Handler de liberação de lugar
 - [ ] **Etapa 7** — Fila de espera (application service + REST)
