@@ -17,4 +17,26 @@ export class ConsumerService {
     // }
     console.log('ConsumerService.handle', msg);
   }
+
+  @RabbitSubscribe({
+    exchange: 'amq.direct',
+    routingKey: 'SpotOfferedToWaitingCustomerIntegrationEvent',
+    queue: 'emails-waiting-list',
+  })
+  handleSpotOfferedToWaitingCustomer(msg: {
+    event_name: string;
+    payload: {
+      customer_id: string;
+      event_id: string;
+      section_id: string;
+      spot_id: string;
+    };
+  }) {
+    // Sem envio real de e-mail: o log é a prova de que a notificação chegou.
+    console.log(
+      `[emails] Lugar liberado! Notificando o cliente ${msg.payload.customer_id} ` +
+        `sobre a seção ${msg.payload.section_id} do evento ${msg.payload.event_id} ` +
+        `(lugar ${msg.payload.spot_id}).`,
+    );
+  }
 }

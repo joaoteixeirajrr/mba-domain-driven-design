@@ -38,11 +38,14 @@ import { DomainEventManager } from '../@core/common/domain/domain-event-manager'
 import { PartnerCreated } from '../@core/events/domain/events/domain-events/partner-created.event';
 import { MyHandlerHandler } from '../@core/events/application/handlers/my-handler.handler';
 import { OrderCancelledHandler } from '../@core/events/application/handlers/order-cancelled.handler';
+import { EventSpotReleasedHandler } from '../@core/events/application/handlers/event-spot-released.handler';
 import { ModuleRef } from '@nestjs/core';
 import { BullModule, InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { IIntegrationEvent } from '../@core/common/domain/integration-event';
 import { PartnerCreatedIntegrationEvent } from '../@core/events/domain/events/integration-events/partner-created.int-events';
+import { SpotOfferedToWaitingCustomerIntegrationEvent } from '../@core/events/domain/events/integration-events/spot-offered-to-waiting-customer.int-events';
+import { SpotOfferedToWaitingCustomer } from '../@core/events/domain/events/domain-events/spot-offered-to-waiting-customer.event';
 
 @Module({
   imports: [
@@ -181,6 +184,12 @@ import { PartnerCreatedIntegrationEvent } from '../@core/events/domain/events/in
         ApplicationService,
       ],
     },
+    {
+      provide: EventSpotReleasedHandler,
+      useFactory: (waitingListRepo, domainEventManager) =>
+        new EventSpotReleasedHandler(waitingListRepo, domainEventManager),
+      inject: ['IWaitingListRepository', DomainEventManager],
+    },
   ],
   controllers: [
     PartnersController,
@@ -218,11 +227,27 @@ export class EventsModule implements OnModuleInit {
         await handler.handle(event);
       });
     });
+    EventSpotReleasedHandler.listensTo().forEach((eventName: string) => {
+      this.domainEventManager.register(eventName, async (event) => {
+        const handler: EventSpotReleasedHandler = await this.moduleRef.resolve(
+          EventSpotReleasedHandler,
+        );
+        await handler.handle(event);
+      });
+    });
     this.domainEventManager.registerForIntegrationEvent(
       PartnerCreated.name,
       async (event) => {
         console.log('integration events');
         const integrationEvent = new PartnerCreatedIntegrationEvent(event);
+        await this.integrationEventsQueue.add(integrationEvent);
+      },
+    );
+    this.domainEventManager.registerForIntegrationEvent(
+      SpotOfferedToWaitingCustomer.name,
+      async (event) => {
+        const integrationEvent =
+          new SpotOfferedToWaitingCustomerIntegrationEvent(event);
         await this.integrationEventsQueue.add(integrationEvent);
       },
     );
