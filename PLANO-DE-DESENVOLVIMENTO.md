@@ -16,7 +16,7 @@ Este plano é derivado da leitura do `desafio.md` e do código real do monorepo.
 - [x] **Etapa 6** — Handler de liberação de lugar
 - [x] **Etapa 7** — Fila de espera (application service + REST)
 - [x] **Etapa 8** — Política + evento de integração + consumo no `apps/emails`
-- [ ] **Etapa 9** — Testes finais (e2e em processo + regressão)
+- [x] **Etapa 9** — Testes finais (e2e em processo + regressão)
 - [ ] **Etapa 10** — Fechamento (validação manual, api.http, docs, README)
 
 ---
