@@ -8,6 +8,7 @@ import { IEventRepository } from '../domain/repositories/event-repository.interf
 import { IOrderRepository } from '../domain/repositories/order-repository.interface';
 import { ISpotReservationRepository } from '../domain/repositories/spot-reservation-repository.interface';
 import { PaymentGateway } from './payment.gateway';
+import { ApplicationService } from '../../common/application/application.service';
 
 export class OrderService {
   constructor(
@@ -17,10 +18,30 @@ export class OrderService {
     private spotReservationRepo: ISpotReservationRepository,
     private uow: IUnitOfWork,
     private paymentGateway: PaymentGateway,
+    private applicationService: ApplicationService,
   ) {}
 
   list() {
     return this.orderRepo.findAll();
+  }
+
+  async cancel(input: { order_id: string }) {
+    return this.applicationService.run(async () => {
+      const order = await this.orderRepo.findById(input.order_id);
+
+      if (!order) {
+        throw new Error('Order not found');
+      }
+
+      order.cancel();
+
+      // o add coloca o agregado no Unit of Work para que o ApplicationService
+      // publique o OrderCancelled. O comando não libera o lugar nem toca na
+      // lista de espera — isso é responsabilidade dos handlers.
+      await this.orderRepo.add(order);
+
+      return order;
+    });
   }
 
   async create(input: {
