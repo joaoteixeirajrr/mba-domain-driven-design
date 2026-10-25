@@ -35,3 +35,8 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .history/
+
+# Artefatos de desafio e planejamento (mantidos apenas localmente)
+desafio.md
+acesso.md
+PLANO-DE-DESENVOLVIMENTO.md

@@ -100,3 +100,42 @@ Content-Type: application/json
     "spot_id": "96298e63-5a38-4352-b97d-322259f10921",
     "card_token": "tok_visa"
 }
+
+
+###
+@spot_id = 96298e63-5a38-4352-b97d-322259f10921
+@order_id = 00000000-0000-0000-0000-000000000000
+
+### ----------------------------------------------------------------------
+### Lista de espera — cancelamento, entrar na fila e consultar a fila
+### ----------------------------------------------------------------------
+
+### Segundo cliente (o que vai entrar na fila da seção esgotada)
+POST http://localhost:3000/customers
+Content-Type: application/json
+
+{
+    "name": "Customer 2",
+    "cpf": "111.444.777-35"
+}
+
+###
+@customer_id_2 = 00000000-0000-0000-0000-000000000000
+
+### Cliente 2 entra na fila de espera da seção esgotada (status PENDING)
+POST http://localhost:3000/events/{{event_id}}/sections/{{section_id}}/waiting-list
+Content-Type: application/json
+
+{
+    "customer_id": "{{customer_id_2}}"
+}
+
+### Consulta a fila de espera (entradas na ordem de chegada)
+GET http://localhost:3000/events/{{event_id}}/sections/{{section_id}}/waiting-list
+
+### Cancela o pedido do Cliente 1 (dispara toda a cadeia de eventos:
+### libera o lugar -> promove o 1º da fila -> notifica por e-mail)
+POST http://localhost:3000/events/{{event_id}}/orders/{{order_id}}/cancel
+
+### Consulta a fila de novo: a entrada do Cliente 2 deve estar NOTIFIED
+GET http://localhost:3000/events/{{event_id}}/sections/{{section_id}}/waiting-list
